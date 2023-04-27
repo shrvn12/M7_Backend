@@ -11,11 +11,8 @@ const saltRounds = process.env.saltRounds;
 const userRouter = express.Router();
 
 userRouter.post('/register',registrationValidator,async (req, res) => {
-    const {name, email, password} = req.body;
-    const payload = {
-        name, email, password
-    }
-    const exists = await userModel.find({email});
+    const payload = req.body
+    const exists = await userModel.findOne({email:payload.email});
     if(exists){
         return res.status(409).send({msg:"Account already exists"});
     }
@@ -51,9 +48,14 @@ userRouter.get('/getProfile',authenticator,async (req, res) => {
 })
 
 userRouter.patch('/editProfile/:id',authenticator,async (req, res) => {
-    const updates = req.body;
+    const data = {};
+    for(let key in req.body){
+        if(key !== 'password' && key !== "Password"){
+            data[key] = req.body[key];
+        }
+    }
     const id = req.params.id;
-    await userModel.findByIdAndUpdate(id,updates);
+    await userModel.findByIdAndUpdate(id,data);
     res.sendStatus(204);
 })
 
