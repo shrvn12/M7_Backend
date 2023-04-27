@@ -1,0 +1,27 @@
+const express = require('express');
+const cors = require('cors');
+require('dotenv').config();
+
+const { connection } = require('./configs/db');
+const { userRouter } = require('./routes/user.routes');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+app.get('/',(req, res) => {
+    res.status(202).send({msg:'Basic API endpoint'});
+})
+
+app.use('/user',userRouter);
+
+app.listen(process.env.port,async () => {
+    try {
+        await connection
+        console.log('Connected to DB 🌿');
+    } catch (error) {
+        console.log('Error while connecting with DB');
+        console.log(error);
+    }
+    console.log(`Running at port ${process.env.port} 🎯`);
+});
